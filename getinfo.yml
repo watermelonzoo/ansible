@@ -1,0 +1,28 @@
+---
+- hosts: all
+  tasks:
+    - name: echo 'ip a' to /tmp/{{ ansible_hostname }}.info
+      shell: |
+        echo 'ip a' > /tmp/{{ ansible_hostname }}.info
+        echo "" >> /tmp/{{ ansible_hostname }}.info
+ 
+    - name: ip a result  to /tmp/{{ ansible_hostname }}.info 
+      shell: ip a >> /tmp/{{ ansible_hostname }}.info
+
+    - name: Get ifcfg ConFig File
+      shell: ls -l /etc/sysconfig/network-scripts | grep ifcfg- | awk '{print $NF}'
+      register: ifcfg_file
+
+    - name:  cat config file  to /tmp/{{ ansible_hostname }}.info
+      shell: |
+        echo '------------------------------------------------------------------------' >> /tmp/{{ ansible_hostname }}.info      
+        echo "{{ item }}" >> /tmp/{{ ansible_hostname }}.info
+        echo "" >> /tmp/{{ ansible_hostname }}.info
+        cat /etc/sysconfig/network-scripts/{{ item }} >> /tmp/{{ ansible_hostname }}.info
+      loop: "{{ ifcfg_file.stdout_lines }}"
+  
+    - name: fetch /tmp/{{ ansible_hostname }}.info to ansible controller /tmp/hostinfo
+      fetch:
+        src: /tmp/{{ ansible_hostname }}.info
+        dest: /tmp/hostinfo/
+        flat: yes
