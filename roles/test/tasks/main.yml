@@ -1,0 +1,11 @@
+---
+- name: create /tmptest
+  file:
+    path: /tmptest
+    statte: directory
+
+- name: test job 1
+  shell: ps aux | grep node
+
+- name: test job 2
+  shell: mkdir -p /tmptest && echo "123" > /tmptest/test.txt
